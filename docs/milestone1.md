@@ -13,3 +13,13 @@ Selected data approved by @alejandra.
 The health organization of Canada has noticed an increase in suicide rates over the last 10 years. Wilson has been assigned to investigate the possible factors leading to this increase. He wants to [explore] the data in order to [compare] the effects over different variables such as time, sex and age. This will allow Wilson to [identify] the relevant factors need to target his Mental Health initiatives to the identified groups.
 
 When Wilson logs into his "Suicide Statistics" app he will be greeted with a world map that he can travel around. Along the bottom he'll see a slider where he can scroll through different years in order to identify changing trends. Wilson can filter different variables such as age group, sex, population and gdp. In doing so, Wilson may identify that as the population of Canada grew young male suicide rate increased. Wilson may then want to compare this to another country with similar statistics (gdp, population) in order to gauge whether there may be other influencing factors. By comparing the similar suicide rates to that of Australia, he hypothesizes that as Canada has grown over time and it's GDP has increased, suicide rates have also done the same. Wilson uses this information to target his new initiative towards young men.
+
+## Section 4: Description of app & sketch
+
+The home page of the shiny app contains a global heat map which shows the distribution of suicide rate across the world. On the bottom of the page, there is a slider that can adjust which year of data you're viewing. The main control panel is on the left third of the page. There are a variety of sliders and radio buttons which allow users to filter out and change variables on the main display. Moreover, there is a dropdown menu which can filter countries. Once users select a country from the menu, the app will direct users to a subpage that shows the distribution (bar chart, line chart) of dataset factors (year, suicide rate etc) based on the selected country. Further, there is an :earth_americas: icon on the bottom right corner of the home page which directs users to another subpage. On this subpage, there are plots (scatter plot, line chart) that show global trends and relations between factors. Lastly, users can click on the :bar_chart: icon on the bottom right corner of the subpage to go back to the home page.
+
+![](../imgs/Sketch1.png)
+
+![](../imgs/Sketch2.png)
+
+![](../imgs/Sketch2.png)
