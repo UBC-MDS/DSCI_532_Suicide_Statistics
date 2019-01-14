@@ -22,4 +22,4 @@ The home page of the shiny app contains a global heat map which shows the distri
 
 ![](../imgs/Sketch2.png)
 
-![](../imgs/Sketch2.png)
+![](../imgs/Sketch3.png)
