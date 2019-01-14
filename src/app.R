@@ -23,9 +23,11 @@ ui <- fluidPage(
     sidebarLayout(
         sidebarPanel(
             uiOutput('location'),
+            uiOutput('suicide_total'),
             uiOutput('gdp'),
             uiOutput('population'),
-            uiOutput('age')
+            uiOutput('age'),
+            uiOutput("sex")
         ),
 
         
@@ -39,56 +41,78 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
     suicideData = read_csv("../data/who_suicide_statistics.csv")
-
+    gdpData <- read_csv("../data/UN_Gdp_data.csv")
+    
+    View(suicideData)
+    
+    tidy_data <- suicideData %>%
+        group_by(country, year) %>%
+        summarise(suicides_total = sum(suicides_no, na.rm = TRUE), pop = sum(population, na.rm = TRUE)) %>%
+        left_join(gdpData, by = c("country" = "Country or Area", "year" = "Year")) %>%
+        select(- "Item")
+    
     countries <- suicideData %>% 
-        select(country) %>% 
-        distinct(country)
+        distinct(country) %>% 
+        select(country)
     
-    ageGroups <- suicideData %>% 
-        select(age) %>% 
-        distinct(age) %>% 
-        # TODO sort logically
-        as.list()
+    ageGroups <- c("5-14", "15-24", "25-34", "35-54", "55-74", "75+")
     
-    populationMax <- suicideData
-    
-    getSelectedLocation <- reactive({
-        location <- geocode(input$location, source="dsk")
-        print(location)
-        return(location)
-    })
+    colMax <- function(data) sapply(data, max, na.rm = TRUE)
+    colMin <- function(data) sapply(data, min, na.rm = TRUE)
     
     output$location = renderUI({
         selectInput("location",
                     "Location:",
-                    choices=countries
+                    choices = countries
+        )
+    })
+    
+    output$suicide_total = renderUI({
+        sliderInput("suicide_total", # Get max and min values of gdp
+                    "Suicide Total:",
+                    min = as.double(colMin(tidy_data)[3]),
+                    max = as.double(colMax(tidy_data)[3]),
+                    value = c(0, 200000)
         )
     })
     
     output$gdp = renderUI({
         sliderInput("gdp", # Get max and min values of gdp
                     "GDP:",
-                    min = 0,
-                    max = 200000,
-                    value = 30
+                    min = round(as.double(colMin(tidy_data)[5]), 3),
+                    max = round(as.double(colMax(tidy_data)[5]), 3),
+                    value = c(0, 200000)
         )
     })
-    
+
     output$population = renderUI({
         sliderInput("population", # Get max and min values of population
                     "Population:",
-                    min = 0,
-                    max = 200000,
-                    value = 30
+                    min = as.double(colMin(tidy_data)[4]),
+                    max = as.double(colMax(tidy_data)[4]),
+                    value = c(as.double(colMin(tidy_data)[4]), as.double(colMax(tidy_data)[4]))
         )
     })
     
     output$age = renderUI({
         sliderTextInput("age", # Get categories
                         "Age:",
-                        choices = ageGroups$age, 
-                        selected = ageGroups$age
+                        choices = ageGroups, 
+                        selected = ageGroups
         )
+    })
+    
+    output$sex = renderUI({
+        radioButtons("sex",
+                    "Sex:", 
+                    choices = c("Male", "Female", "All"),
+                    selected = c("All"),
+                    inline = TRUE)
+    })
+    
+    getSelectedLocation <- reactive({
+        location <- geocode(input$location, source="dsk")
+        return(location)
     })
     
     output$suicideMap <- renderLeaflet({
