@@ -11,6 +11,8 @@ library(tidyverse)
 library(shiny)
 library(shinyWidgets)
 library(leaflet)
+library(leaflet.extras)
+library(jsonlite)
 library(ggmap)
 library(gridExtra)
 
@@ -115,16 +117,61 @@ server <- function(input, output, session) {
     })
     
     getSelectedLocation <- reactive({
-        location <- geocode(input$location, source="dsk")
+        location_to_search <- input$location
+        if (is.null(location_to_search)) {
+            location_to_search <- "Canada"
+        }
+        location <- geocode(location_to_search, source="dsk")
+        
         return(location)
     })
     
+    # https://github.com/datasets/geo-countries/blob/master/data/countries.geojson
+    geojson <- readLines("../data/countries.geojson", warn = FALSE) %>%
+        paste(collapse = "\n") %>%
+        fromJSON(simplifyVector = FALSE)
+    
+    #View(geojson)
+    # Default styles for all features
+    geojson$style = list(
+        weight = 1,
+        color = "#555555",
+        opacity = 1,
+        fillOpacity = 0.8
+    )
+    
+    # Gather GDP estimate from all countries
+    gdp_md_est <- sapply(geojson$features, function(feat) {
+        feat$properties$gdp_md_est
+    })
+    # Gather population estimate from all countries
+    pop_est <- sapply(geojson$features, function(feat) {
+        max(1, feat$properties$pop_est)
+    })
+    
+    # Color by per-capita GDP using quantiles
+    #pal <- colorQuantile("Greens", gdp_md_est / pop_est)
+    
+    # Add a properties$style list to each feature
+    geojson$features <- lapply(geojson$features, function(feat) {
+        feat$properties$style <- list(
+            #fillColor = pal(
+            #    feat$properties$gdp_md_est / max(1, feat$properties$pop_est)
+            #)
+            fillColor = 1
+        )
+        feat
+    })
+    
+    
     output$suicideMap <- renderLeaflet({
         leaflet() %>%
-            addProviderTiles(providers$Stamen.TonerLite,
+            addProviderTiles(providers$CartoDB.PositronNoLabels,
                              options = providerTileOptions(noWrap = TRUE)
             ) %>% 
-            setView(getSelectedLocation()$lon, getSelectedLocation()$lat, zoom=3) #TODO set zoom automatically, efficiency could be improved here as well
+            addGeoJSON(geojson) %>% # TODO figure out how to make this faster
+            setView(getSelectedLocation()$lon, getSelectedLocation()$lat, zoom=3) #TODO set zoom automatically, efficiency could be improved here as well 
+            
     })
     
     # a <- suicideData %>% 
