@@ -27,6 +27,7 @@ ui <- fluidPage(
         sidebarPanel(
             uiOutput('location'),
             uiOutput('suicide_total'),
+            uiOutput('year'),
             uiOutput('gdp'),
             uiOutput('population'),
             uiOutput('age'),
@@ -36,10 +37,7 @@ ui <- fluidPage(
         
         # Show a plot of the generated distribution
         mainPanel(leafletOutput("suicideMap"),
-                  plotOutput("suicide_year"),
-                  plotOutput("gdp_year"),
-                  plotOutput("pop_year"),
-                  plotOutput("suicide_age")
+                  column(6,plotOutput(outputId="plotgraph", width="800px",height="640px"))
         )
     )
 )
@@ -79,6 +77,15 @@ server <- function(input, output, session) {
                     min = as.double(colMin(tidy_data)[3]),
                     max = as.double(colMax(tidy_data)[3]),
                     value = c(0, 200000)
+        )
+    })
+    
+    output$year = renderUI({
+        sliderInput("year", # Get max and min values of gdp
+                    "Year:",
+                    min = 1985, # Pick 1985 because of suicide data 
+                    max = 2015,
+                    value = c(1985, 2015)
         )
     })
     
@@ -169,82 +176,84 @@ server <- function(input, output, session) {
             addProviderTiles(providers$CartoDB.PositronNoLabels,
                              options = providerTileOptions(noWrap = TRUE)
             ) %>% 
-            addGeoJSON(geojson) %>% # TODO figure out how to make this faster
+            #addGeoJSON(geojson) %>% # TODO figure out how to make this faster
             setView(getSelectedLocation()$lon, getSelectedLocation()$lat, zoom=3) #TODO set zoom automatically, efficiency could be improved here as well 
             
     })
+
     
-    # a <- suicideData %>% 
-    #     group_by(country, year,sex) %>% 
-    #     summarise(suicides_total = sum(suicides_no, na.rm = TRUE), pop = sum(population, na.rm = TRUE)) %>% 
-    #     left_join(gdpData, by = c("country" = "Country or Area", "year" = "Year")) %>% 
-    #     filter(country == "United States of America") %>% 
-    #     ggplot(aes(x = year, y = suicides_total)) +
-    #     geom_line(aes(color = sex), size = 2) +
-    #     theme_bw()
-    # b <- suicideData %>% 
-    #     group_by(country, year,sex) %>% 
-    #     summarise(suicides_total = sum(suicides_no, na.rm = TRUE), pop = sum(population, na.rm = TRUE)) %>% 
-    #     left_join(gdpData, by = c("country" = "Country or Area", "year" = "Year")) %>% 
-    #     filter(country == "United States of America") %>% 
-    #     ggplot(aes(x = year, y = suicides_total)) +
-    #     geom_line(aes(color = sex), size = 2) +
-    #     theme_bw()
-    # c <- suicideData %>% 
-    #     group_by(country, year,sex) %>% 
-    #     summarise(suicides_total = sum(suicides_no, na.rm = TRUE), pop = sum(population, na.rm = TRUE)) %>% 
-    #     left_join(gdpData, by = c("country" = "Country or Area", "year" = "Year")) %>% 
-    #     filter(country == "United States of America") %>% 
-    #     ggplot(aes(x = year, y = suicides_total)) +
-    #     geom_line(aes(color = sex), size = 2) +
-    #     theme_bw()
-    # d <- suicideData %>% 
-    #     group_by(country, year,sex) %>% 
-    #     summarise(suicides_total = sum(suicides_no, na.rm = TRUE), pop = sum(population, na.rm = TRUE)) %>% 
-    #     left_join(gdpData, by = c("country" = "Country or Area", "year" = "Year")) %>% 
-    #     filter(country == "United States of America") %>% 
-    #     ggplot(aes(x = year, y = suicides_total)) +
-    #     geom_line(aes(color = sex), size = 2) +
-    #     theme_bw()
-    # 
-    # output$suicide_year <- renderPlot(
-    #     options(repr.plot.width = 7, repr.plot.height = 2.5)
-    #     grid.arrange(a,b,c,d, ncol = 2))
-    #     
-    # output$gdp_year <- renderPlot(
-    #     suicideData %>% 
-    #         group_by(country, year,sex) %>% 
-    #         summarise(suicides_total = sum(suicides_no, na.rm = TRUE), pop = sum(population, na.rm = TRUE)) %>% 
-    #         left_join(gdpData, by = c("country" = "Country or Area", "year" = "Year")) %>% 
-    #         filter(country == "United States of America") %>% 
-    #         ggplot(aes(x = year, y = suicides_total)) +
-    #         geom_line(aes(color = sex), size = 2) +
-    #         theme_bw())
-    # 
-    # output$pop_year <- renderPlot(
-    #     suicideData %>% 
-    #         group_by(country, year,sex) %>% 
-    #         summarise(suicides_total = sum(suicides_no, na.rm = TRUE), pop = sum(population, na.rm = TRUE)) %>% 
-    #         left_join(gdpData, by = c("country" = "Country or Area", "year" = "Year")) %>% 
-    #         filter(country == "United States of America") %>% 
-    #         ggplot(aes(x = year, y = suicides_total)) +
-    #         geom_line(aes(color = sex), size = 2) +
-    #         theme_bw())
-    # 
-    # output$suicide_age <- renderPlot(
-    #     suicideData %>% 
-    #         group_by(country, year,sex) %>% 
-    #         summarise(suicides_total = sum(suicides_no, na.rm = TRUE), pop = sum(population, na.rm = TRUE)) %>% 
-    #         left_join(gdpData, by = c("country" = "Country or Area", "year" = "Year")) %>% 
-    #         filter(country == "United States of America") %>% 
-    #         ggplot(aes(x = year, y = suicides_total)) +
-    #         geom_line(aes(color = sex), size = 2) +
-    #         theme_bw())
-    # 
-    #         
-    # options(repr.plot.width = 7, repr.plot.height = 2.5)
-    # grid.arrange(output$suicide_year,output$gdp_year,output$pop_year,output$suicide_age, ncol = 2)
-    # 
+
+    # wrangling for the plots
+    data_by_year <- reactive({suicideData %>%
+            group_by(country, year) %>%
+            summarise(suicides_total = sum(suicides_no, na.rm = TRUE), pop = sum(population, na.rm = TRUE)) %>%
+            left_join(gdpData, by = c("country" = "Country or Area", "year" = "Year")) %>%
+            filter(country == input$location,
+                              year >= input$year[1],
+                              year <= input$year[2])
+    })
+    
+    data_by_sex <- reactive({suicideData %>%
+            group_by(country, year,sex) %>%
+            summarise(suicides_total = sum(suicides_no, na.rm = TRUE), pop = sum(population, na.rm = TRUE)) %>%
+            left_join(gdpData, by = c("country" = "Country or Area", "year" = "Year")) %>%
+            filter(country == input$location,
+                   year >= input$year[1],
+                   year <= input$year[2])
+    })
+    
+    data_by_age <- reactive({suicideData %>%
+            filter(country == input$location,
+                   year >= input$year[1],
+                   year <= input$year[2]) %>%
+            group_by(country, age,sex) %>%
+            summarise(suicides_total = sum(suicides_no, na.rm = TRUE)) 
+    })
+    
+    # Line chart shows Suicide Total vs. year
+    pt1 <- reactive(data_by_sex() %>% 
+                                          ggplot(aes(x = year, y = suicides_total)) +
+                                          geom_line(aes(color = sex), size = 2)+
+                                          xlab("Year")+
+                                          ylab("Number of Suicide") +
+                                          ggtitle("Number of suicides vs. years") +
+                                          theme_bw())
+    
+    
+    # Line chart shows gdp vs. year
+    pt2 <- reactive(data_by_year() %>%
+                                      ggplot(aes(x = year, y = Value)) +
+                                      geom_line(size = 2)+
+                                      xlab("Year")+
+                                      ylab("GDP Per Capita") +
+                                      ggtitle("GDP Per Capita vs. years") +
+                                      theme_bw())
+    
+    # Line chart shows pop vs. year
+    pt3 <- reactive(data_by_sex() %>% 
+                                      ggplot(aes(x = year, y = pop)) +
+                                      geom_line(aes(color = sex), size = 2) +
+                                      geom_line(data = data_by_year(), size = 2)+
+                                      xlab("Year")+
+                                      ylab("Population") +
+                                      ggtitle("Population vs. years") +
+                                      theme_bw())
+    
+    # bar chart shows suicide_total vs. age
+    pt4 <- reactive(data_by_age() %>%
+                                         ggplot(aes(x = fct_relevel(age, "5-14 years"), y = suicides_total)) +
+                                         geom_col(aes(fill = sex), position="dodge")+
+                                         xlab("Age Group")+
+                                         ylab("Number of Suicides") +
+                                         ggtitle("Number of Suicides vs. age groups")+
+                                         theme_bw())
+    
+    # render plots with gridExtra
+    output$plotgraph = renderPlot({
+        ptlist <- 
+        grid.arrange(grobs=list(pt1(),pt2(),pt3(),pt4()),
+                     ncol=2)
+    })
 }
 
 # Run the application 
