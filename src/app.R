@@ -12,6 +12,7 @@ library(shiny)
 library(shinyWidgets)
 library(leaflet)
 library(ggmap)
+library(gridExtra)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -32,8 +33,11 @@ ui <- fluidPage(
 
         
         # Show a plot of the generated distribution
-        mainPanel(
-           leafletOutput("suicideMap")
+        mainPanel(leafletOutput("suicideMap"),
+                  plotOutput("suicide_year"),
+                  plotOutput("gdp_year"),
+                  plotOutput("pop_year"),
+                  plotOutput("suicide_age")
         )
     )
 )
@@ -43,7 +47,7 @@ server <- function(input, output, session) {
     suicideData = read_csv("../data/who_suicide_statistics.csv")
     gdpData <- read_csv("../data/UN_Gdp_data.csv")
     
-    View(suicideData)
+    #View(suicideData)
     
     tidy_data <- suicideData %>%
         group_by(country, year) %>%
@@ -122,6 +126,78 @@ server <- function(input, output, session) {
             ) %>% 
             setView(getSelectedLocation()$lon, getSelectedLocation()$lat, zoom=3) #TODO set zoom automatically, efficiency could be improved here as well
     })
+    
+    # a <- suicideData %>% 
+    #     group_by(country, year,sex) %>% 
+    #     summarise(suicides_total = sum(suicides_no, na.rm = TRUE), pop = sum(population, na.rm = TRUE)) %>% 
+    #     left_join(gdpData, by = c("country" = "Country or Area", "year" = "Year")) %>% 
+    #     filter(country == "United States of America") %>% 
+    #     ggplot(aes(x = year, y = suicides_total)) +
+    #     geom_line(aes(color = sex), size = 2) +
+    #     theme_bw()
+    # b <- suicideData %>% 
+    #     group_by(country, year,sex) %>% 
+    #     summarise(suicides_total = sum(suicides_no, na.rm = TRUE), pop = sum(population, na.rm = TRUE)) %>% 
+    #     left_join(gdpData, by = c("country" = "Country or Area", "year" = "Year")) %>% 
+    #     filter(country == "United States of America") %>% 
+    #     ggplot(aes(x = year, y = suicides_total)) +
+    #     geom_line(aes(color = sex), size = 2) +
+    #     theme_bw()
+    # c <- suicideData %>% 
+    #     group_by(country, year,sex) %>% 
+    #     summarise(suicides_total = sum(suicides_no, na.rm = TRUE), pop = sum(population, na.rm = TRUE)) %>% 
+    #     left_join(gdpData, by = c("country" = "Country or Area", "year" = "Year")) %>% 
+    #     filter(country == "United States of America") %>% 
+    #     ggplot(aes(x = year, y = suicides_total)) +
+    #     geom_line(aes(color = sex), size = 2) +
+    #     theme_bw()
+    # d <- suicideData %>% 
+    #     group_by(country, year,sex) %>% 
+    #     summarise(suicides_total = sum(suicides_no, na.rm = TRUE), pop = sum(population, na.rm = TRUE)) %>% 
+    #     left_join(gdpData, by = c("country" = "Country or Area", "year" = "Year")) %>% 
+    #     filter(country == "United States of America") %>% 
+    #     ggplot(aes(x = year, y = suicides_total)) +
+    #     geom_line(aes(color = sex), size = 2) +
+    #     theme_bw()
+    # 
+    # output$suicide_year <- renderPlot(
+    #     options(repr.plot.width = 7, repr.plot.height = 2.5)
+    #     grid.arrange(a,b,c,d, ncol = 2))
+    #     
+    # output$gdp_year <- renderPlot(
+    #     suicideData %>% 
+    #         group_by(country, year,sex) %>% 
+    #         summarise(suicides_total = sum(suicides_no, na.rm = TRUE), pop = sum(population, na.rm = TRUE)) %>% 
+    #         left_join(gdpData, by = c("country" = "Country or Area", "year" = "Year")) %>% 
+    #         filter(country == "United States of America") %>% 
+    #         ggplot(aes(x = year, y = suicides_total)) +
+    #         geom_line(aes(color = sex), size = 2) +
+    #         theme_bw())
+    # 
+    # output$pop_year <- renderPlot(
+    #     suicideData %>% 
+    #         group_by(country, year,sex) %>% 
+    #         summarise(suicides_total = sum(suicides_no, na.rm = TRUE), pop = sum(population, na.rm = TRUE)) %>% 
+    #         left_join(gdpData, by = c("country" = "Country or Area", "year" = "Year")) %>% 
+    #         filter(country == "United States of America") %>% 
+    #         ggplot(aes(x = year, y = suicides_total)) +
+    #         geom_line(aes(color = sex), size = 2) +
+    #         theme_bw())
+    # 
+    # output$suicide_age <- renderPlot(
+    #     suicideData %>% 
+    #         group_by(country, year,sex) %>% 
+    #         summarise(suicides_total = sum(suicides_no, na.rm = TRUE), pop = sum(population, na.rm = TRUE)) %>% 
+    #         left_join(gdpData, by = c("country" = "Country or Area", "year" = "Year")) %>% 
+    #         filter(country == "United States of America") %>% 
+    #         ggplot(aes(x = year, y = suicides_total)) +
+    #         geom_line(aes(color = sex), size = 2) +
+    #         theme_bw())
+    # 
+    #         
+    # options(repr.plot.width = 7, repr.plot.height = 2.5)
+    # grid.arrange(output$suicide_year,output$gdp_year,output$pop_year,output$suicide_age, ncol = 2)
+    # 
 }
 
 # Run the application 
