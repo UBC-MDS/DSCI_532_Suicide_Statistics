@@ -216,7 +216,8 @@ server <- function(input, output, session) {
                                           geom_line(aes(color = sex), size = 2)+
                                           xlab("Year")+
                                           ylab("Number of Suicide") +
-                                          ggtitle("Number of suicides vs. years") +
+                                          ggtitle(paste(input$location, "From",input$year[1],"to",input$year[2])
+                                                  , "Number of suicides vs. years") +
                                           theme_bw())
     
     
@@ -226,7 +227,7 @@ server <- function(input, output, session) {
                                       geom_line(size = 2)+
                                       xlab("Year")+
                                       ylab("GDP Per Capita") +
-                                      ggtitle("GDP Per Capita vs. years") +
+                                      ggtitle("",subtitle = "GDP Per Capita vs. years") +
                                       theme_bw())
     
     # Line chart shows pop vs. year
@@ -236,7 +237,7 @@ server <- function(input, output, session) {
                                       geom_line(data = data_by_year(), size = 2)+
                                       xlab("Year")+
                                       ylab("Population") +
-                                      ggtitle("Population vs. years") +
+                                      ggtitle("",subtitle = "Population vs. years") +
                                       theme_bw())
     
     # bar chart shows suicide_total vs. age
@@ -245,7 +246,7 @@ server <- function(input, output, session) {
                                          geom_col(aes(fill = sex), position="dodge")+
                                          xlab("Age Group")+
                                          ylab("Number of Suicides") +
-                                         ggtitle("Number of Suicides vs. age groups")+
+                                         ggtitle("",subtitle = "Number of Suicides vs. age groups")+
                                          theme_bw())
     
     # render plots with gridExtra
