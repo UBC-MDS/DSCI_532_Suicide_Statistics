@@ -134,7 +134,7 @@ server <- function(input, output, session) {
     })
     
     # https://github.com/datasets/geo-countries/blob/master/data/countries.geojson
-    geojson <- readLines("../data/countries.geojson", warn = FALSE) %>%
+    geojson <- readLines("../data/countries.geo.json", warn = FALSE) %>%
         paste(collapse = "\n") %>%
         fromJSON(simplifyVector = FALSE)
     
@@ -176,7 +176,7 @@ server <- function(input, output, session) {
             addProviderTiles(providers$CartoDB.PositronNoLabels,
                              options = providerTileOptions(noWrap = TRUE)
             ) %>% 
-            #addGeoJSON(geojson) %>% # TODO figure out how to make this faster
+            addGeoJSON(geojson) %>% # TODO figure out how to make this faster
             setView(getSelectedLocation()$lon, getSelectedLocation()$lat, zoom=3) #TODO set zoom automatically, efficiency could be improved here as well 
             
     })
