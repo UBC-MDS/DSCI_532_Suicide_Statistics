@@ -15,7 +15,6 @@ library(leaflet.extras)
 library(jsonlite)
 library(ggmap)
 library(gridExtra)
-library(rsconnect)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -45,8 +44,8 @@ ui <- fluidPage(
 
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
-    suicideData = read_csv("../data/who_suicide_statistics.csv")
-    gdpData <- read_csv("../data/UN_Gdp_data.csv")
+    suicideData = read_csv("data/who_suicide_statistics.csv")
+    gdpData <- read_csv("data/UN_Gdp_data.csv")
     
     #View(suicideData)
     
@@ -164,7 +163,7 @@ server <- function(input, output, session) {
     })
     
     # https://github.com/datasets/geo-countries/blob/master/data/countries.geojson
-    geojson <- readLines("../data/countries.geo.json", warn = FALSE) %>%
+    geojson <- readLines("data/countries.geo.json", warn = FALSE) %>%
         paste(collapse = "\n") %>%
         fromJSON(simplifyVector = FALSE)
     
