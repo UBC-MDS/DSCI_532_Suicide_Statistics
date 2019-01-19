@@ -1,13 +1,16 @@
 # Milestone 2:First submission of an app
 #### Wilson Deng, Rayce Rossum
 
-#### Deployment of app (shinyapps.io)
+#### Deployment (shinyapps.io)
 
-#### Screenshots of the draft app
+https://raycer.shinyapps.io/SuicideStatistics/
+
+#### Screenshot
 
 ![](../imgs/Draft_App_Screenshot_1.png)
 
 ### Rationale
+
 Our design choices were built with specific countries in mind. We wanted our users to be able to select their own country and see all the information they need out of it at a glance in order to make an informed decision about which groups to target.
 
 Along the left hand side we have filters for various data:
@@ -48,4 +51,4 @@ In our proposal, we planned to make the app with multiple pages but we decided t
 
 ### Changes since proposal
 
-As R provides simple interfaces for making sidebars we abandoned the idea of a full screen map with plots on seperate pages in favor of a more compartmentalized design. As we think that the users of our app care about the trends and relations within a specific country, we've placed them on the main page. Another thing we have changed is the slider of "Suicide Rate" to "Suicide Total" because the "Suicide Rate" is actually a very small number and it cannot represent any interesting data by itself. Only when compared to other data does it become a relevant factor. 
+As R provides simple interfaces for making sidebars we abandoned the idea of a full screen map with plots on seperate pages in favor of a more compartmentalized design. As we think that the users of our app care about the trends and relations within a specific country, we've placed them on the main page. Another thing we have changed is the slider of "Suicide Rate" to "Suicide Total" because the "Suicide Rate" is actually a very small number and it cannot represent any interesting data by itself. Only when compared to other data does it become a relevant factor.
