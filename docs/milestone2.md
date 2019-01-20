@@ -52,3 +52,5 @@ In our proposal, we planned to make the app with multiple pages but we decided t
 ### Changes since proposal
 
 As R provides simple interfaces for making sidebars we abandoned the idea of a full screen map with plots on seperate pages in favor of a more compartmentalized design. As we think that the users of our app care about the trends and relations within a specific country, we've placed them on the main page. Another thing we have changed is the slider of "Suicide Rate" to "Suicide Total" because the "Suicide Rate" is actually a very small number and it cannot represent any interesting data by itself. Only when compared to other data does it become a relevant factor.
+
+Our app facilitates the usage of a mental health organization to target specific groups within their country. As we don't have the heatmap working, we don't allow for comparison across countries for similarities but hope to address this in the next release.
