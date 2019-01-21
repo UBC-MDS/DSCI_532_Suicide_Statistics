@@ -26,18 +26,24 @@ ui <- fluidPage(
     sidebarLayout(
         sidebarPanel(
             uiOutput('location'),
-            uiOutput('suicide_total'),
+            #uiOutput('suicide_total'),
             uiOutput('year'),
-            uiOutput('gdp'),
-            uiOutput('population'),
+            #uiOutput('gdp'),
+            #uiOutput('population'),
             uiOutput('age'),
             uiOutput("sex")
         ),
 
         
         # Show a plot of the generated distribution
-        mainPanel(leafletOutput("suicideMap"),
-                  column(6,plotOutput(outputId="plotgraph", width="800px",height="640px"))
+        mainPanel(
+                tabsetPanel(type = "tabs",
+                        tabPanel("Country", column(6,plotOutput(outputId="plotgraph", width="800px",height="640px"))),
+                        tabPanel("World", verbatimTextOutput("summary"))#,
+                        
+                #leafletOutput("suicideMap")
+                
+           )
         )
     )
 )
@@ -152,33 +158,33 @@ server <- function(input, output, session) {
                     inline = TRUE)
     })
     
-    getSelectedLocation <- reactive({
-        location_to_search <- input$location
-        if (is.null(location_to_search)) {
-            location_to_search <- "Canada"
-        }
-        location <- geocode(location_to_search, source="dsk")
-        
-        return(location)
-    })
+    # getSelectedLocation <- reactive({
+    #     location_to_search <- input$location
+    #     if (is.null(location_to_search)) {
+    #         location_to_search <- "Canada"
+    #     }
+    #     location <- geocode(location_to_search, source="dsk")
+    #     
+    #     return(location)
+    # })
     
-    # https://github.com/datasets/geo-countries/blob/master/data/countries.geojson
-    geojson <- readLines("data/countries.geo.json", warn = FALSE) %>%
-        paste(collapse = "\n") %>%
-        fromJSON(simplifyVector = FALSE)
+    # # https://github.com/datasets/geo-countries/blob/master/data/countries.geojson
+    # geojson <- readLines("data/countries.geo.json", warn = FALSE) %>%
+    #     paste(collapse = "\n") %>%
+    #     fromJSON(simplifyVector = FALSE)
     
     # Default styles for all features
-    geojson$style = list(
-        weight = 1,
-        color = "#555555",
-        opacity = 1,
-        fillOpacity = 0.8
-    )
+    # geojson$style = list(
+    #     weight = 1,
+    #     color = "#555555",
+    #     opacity = 1,
+    #     fillOpacity = 0.8
+    # )
     
     # Gather GDP estimate from all countries
-    geojson_countries <- sapply(geojson$features, function(feat) {
-        feat$properties$name
-    })
+    # geojson_countries <- sapply(geojson$features, function(feat) {
+    #     feat$properties$name
+    # })
     #print(geojson_countries)
     #geojson_countries_df <- as_tibble(geojson_countries)
     #print(suicideData)
@@ -190,9 +196,9 @@ server <- function(input, output, session) {
     #print(suicide_data_geojson)
     
     # Gather population estimate from all countries
-    pop <- sapply(geojson$features, function(feat) {
-        max(1, feat$properties$pop)
-    })
+    # pop <- sapply(geojson$features, function(feat) {
+    #     max(1, feat$properties$pop)
+    # })
     
     # Color by per-capita GDP using quantiles
     # pal <- reactive({
@@ -200,27 +206,27 @@ server <- function(input, output, session) {
     # })
     
     # Add a properties$style list to each feature
-    geojson$features <- lapply(geojson$features, function(feat) {
-        feat$properties$style <- list(
-            # fillColor = pal(
-            #     feat$properties$suicides_total / max(1, feat$properties$pop)
-            # )
-            fillColor = 1
-        )
-        feat
-    })
-    print(geojson$features)
+    # geojson$features <- lapply(geojson$features, function(feat) {
+    #     feat$properties$style <- list(
+    #         # fillColor = pal(
+    #         #     feat$properties$suicides_total / max(1, feat$properties$pop)
+    #         # )
+    #         fillColor = 1
+    #     )
+    #     feat
+    # })
+    # print(geojson$features)
     
     
-    output$suicideMap <- renderLeaflet({
-        leaflet() %>%
-            addProviderTiles(providers$CartoDB.PositronNoLabels,
-                             options = providerTileOptions(noWrap = TRUE)
-            ) %>% 
-            addGeoJSON(geojson) %>%
-            setView(getSelectedLocation()$lon, getSelectedLocation()$lat, zoom=3) #TODO set zoom automatically, efficiency could be improved here as well 
-            
-    })
+    # output$suicideMap <- renderLeaflet({
+    #     leaflet() %>%
+    #         addProviderTiles(providers$CartoDB.PositronNoLabels,
+    #                          options = providerTileOptions(noWrap = TRUE)
+    #         ) %>% 
+    #         addGeoJSON(geojson) %>%
+    #         setView(getSelectedLocation()$lon, getSelectedLocation()$lat, zoom=3) #TODO set zoom automatically, efficiency could be improved here as well 
+    #         
+    # })
 
     # Line chart shows Suicide Total vs. year
     pt1 <- reactive(data_by_sex() %>% 
@@ -229,7 +235,7 @@ server <- function(input, output, session) {
                                           xlab("Year")+
                                           ylab("Number of Suicide") +
                                           ggtitle(paste(input$location, "From",input$year[1],"to",input$year[2])
-                                                  , "Number of suicides vs. years") +
+                                                  , "Number of Suicides vs. Year") +
                                           theme_bw())
     
     
@@ -239,7 +245,7 @@ server <- function(input, output, session) {
                                       geom_line(size = 2)+
                                       xlab("Year")+
                                       ylab("GDP Per Capita") +
-                                      ggtitle("",subtitle = "GDP Per Capita vs. years") +
+                                      ggtitle("",subtitle = "GDP Per Capita vs. Year") +
                                       theme_bw())
     
     # Line chart shows pop vs. year
@@ -249,7 +255,7 @@ server <- function(input, output, session) {
                                       geom_line(data = data_by_year(), size = 2)+
                                       xlab("Year")+
                                       ylab("Population") +
-                                      ggtitle("",subtitle = "Population vs. years") +
+                                      ggtitle("",subtitle = "Population vs. Year") +
                                       theme_bw())
     
     # bar chart shows suicide_total vs. age
@@ -258,7 +264,7 @@ server <- function(input, output, session) {
                                          geom_col(aes(fill = sex), position="dodge")+
                                          xlab("Age Group")+
                                          ylab("Number of Suicides") +
-                                         ggtitle("",subtitle = "Number of Suicides vs. age groups")+
+                                         ggtitle("",subtitle = "Number of Suicides vs. Age Group")+
                                          theme_bw())
     
     # render plots with gridExtra
