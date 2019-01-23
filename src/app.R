@@ -37,7 +37,7 @@ ui <- fluidPage(
         
         # Show a plot of the generated distribution
         mainPanel(
-            tabsetPanel(type = "tabs",
+            tabsetPanel(
                         tabPanel("Country", column(6,plotOutput(outputId="plotgraph", width="800px",height="640px"))),
                         tabPanel("World", column(6,plotOutput(outputId="plotgraph_world", width="800px",height="640px")))#,
                         
@@ -267,7 +267,8 @@ server <- function(input, output, session) {
                         geom_line(aes(color = sex), size = 2)+
                         xlab("Year")+
                         ylab("Suicide Rate") +
-                        ggtitle(paste(input$location, "From",input$year[1],"to",input$year[2])
+                        scale_y_continuous(labels = scales::number_format(accuracy = 0.00001)) + 
+                        ggtitle(paste(input$location, "From", input$year[1], "to", input$year[2])
                                 , "Number of Suicides vs. Year") +
                         theme_bw())
     
@@ -279,7 +280,7 @@ server <- function(input, output, session) {
                         expand_limits(y = 0) +
                         xlab("Year")+
                         ylab("GDP Per Capita") +
-                        ggtitle("",subtitle = "GDP Per Capita vs. Year") +
+                        ggtitle("", subtitle = "GDP Per Capita vs. Year") +
                         theme_bw())
     
     # Line chart shows pop vs. year
@@ -287,43 +288,55 @@ server <- function(input, output, session) {
                         ggplot(aes(x = year, y = pop)) +
                         geom_line(aes(color = sex), size = 2) +
                         geom_line(data = data_by_year(), size = 2) + 
+                        scale_y_continuous(labels = scales::number_format(accuracy = 1)) + 
                         expand_limits(y = 0) +
                         xlab("Year")+
                         ylab("Population") +
-                        ggtitle("",subtitle = "Population vs. Year") +
+                        ggtitle("", subtitle = "Population vs. Year") +
                         theme_bw())
     
     # bar chart shows suicide_total vs. age
     pt4 <- reactive(data_by_age() %>%
                         ggplot(aes(x = fct_relevel(age, "5-14 years"), y = suicide_rate)) +
                         geom_col(aes(fill = sex), position="dodge")+
-                        xlab("Age Group")+
+                        xlab("Age Group") +
                         ylab("Suicides Rate") +
-                        ggtitle("",subtitle = "Number of Suicides vs. Age Group")+
+                        scale_y_continuous(labels = scales::number_format(accuracy = 0.00001)) + 
+                        ggtitle("", subtitle = "Number of Suicides vs. Age Group")+
+                        theme_bw() + 
+                        theme(axis.text.x = element_text(angle = -90, hjust = 1)))
+    
+    # scatter chart shows suicide_rate vs. Log Population over the world
+    # This plot does not need to be interactive
+    pt5 <- reactive(world_by_country_year() %>%
+                        left_join(gdpData, by = c("country" = "Country or Area", "year" = "Year")) %>%
+                        ggplot(aes(x = pop, y = suicide_rate)) +
+                        #geom_point(alpha = 0.4) +
+                        geom_bin2d() +
+                        scale_x_log10(breaks = scales::trans_breaks("log10", function(x) 10^x),
+                                      labels = scales::trans_format("log10", scales::math_format(10^.x))
+                        ) +
+                        scale_y_continuous(labels = scales::number_format(accuracy = 0.0001)) + 
+                        #scale_y_continuous(scales::number_format(accuracy = 0.01)) +
+                        xlab("log Population")+
+                        ylab("Suicide Rate") +
+                        ggtitle(paste("World from", input$year[1], "to", input$year[2]), subtitle = "Suicide Rate vs. Log Population") +
                         theme_bw())
     
     # scatter chart shows suicide_rate vs. Log GDP over the world
     # This plot does not need to be interactive
-    pt5 <- reactive(world_by_country_year() %>%
+    pt6 <- reactive(world_by_country_year() %>%
                         ggplot(aes(x = Value, y = suicide_rate)) +
-                        geom_point(alpha = 0.4) +
-                        scale_x_log10() +
+                        geom_bin2d() +
+                        scale_x_log10(breaks = scales::trans_breaks("log10", function(x) 10^x),
+                                      labels = scales::trans_format("log10", scales::math_format(10^.x))
+                        ) +
+                        scale_y_continuous(labels = scales::number_format(accuracy = 0.0001)) + 
                         xlab("log GDP Per Capita")+
                         ylab("Suicide Rate") +
-                        ggtitle("World",subtitle = "Suicide Rate vs. Log GDP Per Capita") +
+                        ggtitle("", subtitle = "Suicide Rate vs. Log GDP Per Capita") +
                         theme_bw())
     
-    # scatter chart shows suicide_rate vs. Log Population over the world
-    # This plot does not need to be interactive
-    pt6 <- reactive(world_by_country_year() %>%
-                        left_join(gdpData, by = c("country" = "Country or Area", "year" = "Year")) %>%
-                        ggplot(aes(x = pop, y = suicide_rate)) +
-                        geom_point(alpha = 0.4) +
-                        scale_x_log10() +
-                        xlab("log Population")+
-                        ylab("Suicide Rate") +
-                        ggtitle("",subtitle = "Suicide Rate vs. Log Population") +
-                        theme_bw())
     
     # Line chart shows suicide_rate vs. Year over the world
     # This plot is only interactive with year and/or sex input
@@ -333,7 +346,7 @@ server <- function(input, output, session) {
                         geom_line(data = world_by_year(), size = 2) +
                         xlab("Year")+
                         ylab("Suicide Rate") +
-                        ggtitle("",subtitle = "Suicide Rate vs. Year") +
+                        ggtitle("", subtitle = "Suicide Rate vs. Year") +
                         theme_bw())
     
     # bar chart shows suicide_rage vs. age world
