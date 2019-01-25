@@ -2,6 +2,11 @@
 
 #### Wilson Deng, Rayce Rossum
 
+| Links               |
+|---|---|
+| [Deployed Shiny App](https://raycer.shinyapps.io/SuicideStatistics/)|[Given feedback 1](https://github.com/UBC-MDS/DSCI532_Davy_Reza/issues/6)|
+| [Shiny App Source Code](https://github.com/UBC-MDS/DSCI_532_Suicide_Statistics/blob/master/src/app.R) |[Given feedback 2](https://github.com/UBC-MDS/DSCI_532_Mental-health-survey-Tech/issues/12)|
+
 ## Proposal
 
 ### Section 1: Overview
@@ -32,3 +37,10 @@ The home page of the shiny app contains a global heat map which shows the distri
 ![](imgs/Sketch2.png)
 
 ![](imgs/Sketch3.png)
+
+### Release
+[Release v0.1 (pre-release)](https://github.com/UBC-MDS/DSCI_532_Suicide_Statistics/tree/v0.1)
+[Release v0.2 (pre-release)](https://github.com/UBC-MDS/DSCI_532_Suicide_Statistics/tree/v0.2)
+
+### Dependencies
+

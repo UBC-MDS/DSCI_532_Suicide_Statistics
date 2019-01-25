@@ -71,7 +71,7 @@ server <- function(input, output, session) {
     colMin <- function(data) sapply(data, min, na.rm = TRUE)
     
     # Data wrangling
-    # Need to add sex filter
+    # Need to add sex/age filter
     data_by_year <- reactive({suicideData %>%
             group_by(country, year) %>%
             summarise(suicides_total = sum(suicides_no, na.rm = TRUE), pop = sum(population, na.rm = TRUE)) %>%
@@ -304,7 +304,7 @@ server <- function(input, output, session) {
                         scale_y_continuous(labels = scales::number_format(accuracy = 0.00001)) + 
                         ggtitle("", subtitle = "Number of Suicides vs. Age Group")+
                         theme_bw() + 
-                        theme(axis.text.x = element_text(angle = -90, hjust = 1)))
+                        theme(axis.text.x = element_text(angle = 45, hjust = 1)))
     
     # scatter chart shows suicide_rate vs. Log Population over the world
     # This plot does not need to be interactive
@@ -357,7 +357,8 @@ server <- function(input, output, session) {
                         xlab("Age Group")+
                         ylab("Number of Suicides") +
                         ggtitle("",subtitle = "Number of Suicides vs. Age Group")+
-                        theme_bw())
+                        theme_bw() + 
+                        theme(axis.text.x = element_text(angle = 45, hjust = 1)))
     
     # render plots with gridExtra
     output$plotgraph = renderPlot({
