@@ -10,6 +10,7 @@
 library(tidyverse)
 library(shiny)
 library(shinyWidgets)
+library(shinythemes)
 library(leaflet)
 library(leaflet.extras)
 library(jsonlite)
@@ -17,7 +18,7 @@ library(ggmap)
 library(gridExtra)
 
 # Define UI for application that draws a histogram
-ui <- fluidPage(
+ui <- fluidPage(theme = shinytheme("slate"),
     
     # Application title
     titlePanel("World Suicide Statistics by Country"),
