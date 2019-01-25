@@ -2,7 +2,7 @@
 
 #### Wilson Deng, Rayce Rossum
 
-| Links               |
+| Links               ||
 |---|---|
 | [Deployed Shiny App](https://raycer.shinyapps.io/SuicideStatistics/)|[Given feedback 1](https://github.com/UBC-MDS/DSCI532_Davy_Reza/issues/6)|
 | [Shiny App Source Code](https://github.com/UBC-MDS/DSCI_532_Suicide_Statistics/blob/master/src/app.R) |[Given feedback 2](https://github.com/UBC-MDS/DSCI_532_Mental-health-survey-Tech/issues/12)|
