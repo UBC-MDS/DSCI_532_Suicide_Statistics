@@ -10,6 +10,7 @@
 library(tidyverse)
 library(shiny)
 library(shinyWidgets)
+library(shinythemes)
 library(leaflet)
 library(leaflet.extras)
 library(jsonlite)
@@ -17,7 +18,7 @@ library(ggmap)
 library(gridExtra)
 
 # Define UI for application that draws a histogram
-ui <- fluidPage(
+ui <- fluidPage(theme = shinytheme("simplex"),
     
     # Application title
     titlePanel("World Suicide Statistics by Country"),
@@ -81,14 +82,21 @@ server <- function(input, output, session) {
                    year <= input$year[2])
     })
     
-    data_by_sex <- reactive({suicideData %>%
+    data_by_sex <- reactive({
+        sexSelection = tolower(input$sex)
+        if (input$sex == "All"){
+            sexSelection <- c("male", "female")
+        }
+        
+        suicideData %>%
             group_by(country, year,sex) %>%
             summarise(suicides_total = sum(suicides_no, na.rm = TRUE), pop = sum(population, na.rm = TRUE)) %>% 
             mutate(suicide_rate = suicides_total/pop) %>%
             left_join(gdpData, by = c("country" = "Country or Area", "year" = "Year")) %>%
             filter(country == input$location,
                    year >= input$year[1],
-                   year <= input$year[2])
+                   year <= input$year[2],
+                   sex %in% sexSelection)
     })
     
     data_by_age <- reactive({
@@ -96,7 +104,33 @@ server <- function(input, output, session) {
             filter(country == input$location,
                    year >= input$year[1],
                    year <= input$year[2]) %>%
-            group_by(country, age,sex) %>%
+            group_by(country, age, sex) %>%
+            summarise(suicides_total = sum(suicides_no, na.rm = TRUE), pop = sum(population, na.rm = TRUE)) %>% 
+            mutate(suicide_rate = suicides_total/pop) 
+    })
+    
+    data_by_age_sex <- reactive({
+        ageGroups <- c("5-14", "15-24", "25-34", "35-54", "55-74", "75+")
+        ageSelection <- input$age
+        ageRange <- which(ageGroups %in% ageSelection)
+        
+        for (i in ageRange[1]:ageRange[2]) {
+            ageSelection[i] = paste(ageGroups[i], "years")
+        }
+        
+        
+        sexSelection = tolower(input$sex)
+        if (input$sex == "All"){
+            sexSelection <- c("male", "female")
+        }
+        
+        suicideData %>%
+            filter(country == input$location,
+                   year >= input$year[1],
+                   year <= input$year[2],
+                   sex %in% sexSelection,
+                   age %in% ageSelection) %>%
+            group_by(country, age, sex) %>%
             summarise(suicides_total = sum(suicides_no, na.rm = TRUE), pop = sum(population, na.rm = TRUE)) %>% 
             mutate(suicide_rate = suicides_total/pop) 
     })
@@ -108,7 +142,8 @@ server <- function(input, output, session) {
             left_join(gdpData, by = c("country" = "Country or Area", "year" = "Year"))
     })
     
-    world_by_year <- reactive({suicideData %>%
+    world_by_year <- reactive({
+        suicideData %>%
             group_by(year) %>%
             summarise(suicides_total = sum(suicides_no, na.rm = TRUE), pop = sum(population, na.rm = TRUE)) %>% 
             mutate(suicide_rate = suicides_total/pop) %>% 
@@ -116,21 +151,50 @@ server <- function(input, output, session) {
                    year <= input$year[2])
     })
     
-    world_by_sex_year <- reactive({suicideData %>%
+    world_by_sex_year <- reactive({
+        sexSelection = tolower(input$sex)
+        if (input$sex == "All"){
+            sexSelection <- c("male", "female")
+        }
+        
+        print(sexSelection)
+        
+        suicideData %>%
             group_by(year, sex) %>%
             summarise(suicides_total = sum(suicides_no, na.rm = TRUE), pop = sum(population, na.rm = TRUE)) %>% 
             mutate(suicide_rate = suicides_total/pop) %>%
             filter(year >= input$year[1],
-                   year <= input$year[2])
+                   year <= input$year[2],
+                   sex %in% sexSelection)
     })
     
-    world_by_sex_year_age <- reactive({suicideData %>%
+    world_by_sex_year_age <- reactive({
+        ageGroups <- c("5-14", "15-24", "25-34", "35-54", "55-74", "75+")
+        ageSelection <- input$age
+        ageRange <- which(ageGroups %in% ageSelection)
+        
+        for (i in ageRange[1]:ageRange[2]) {
+            ageSelection[i] = paste(ageGroups[i], "years")
+        }
+        
+        print(ageSelection)
+        
+        sexSelection = tolower(input$sex)
+        if (input$sex == "All"){
+            sexSelection <- c("male", "female")
+        }
+        
+        
+        suicideData %>%
             group_by(year, sex, age) %>%
             summarise(suicides_total = sum(suicides_no, na.rm = TRUE), pop = sum(population, na.rm = TRUE)) %>%
+            mutate(suicide_rate = suicides_total/pop) %>%
             filter(year >= input$year[1],
-                   year <= input$year[2])
+                   year <= input$year[2],
+                   sex %in% sexSelection,
+                   age %in% ageSelection)
     })
-    
+
     
     output$location = renderUI({
         selectInput("location",
@@ -272,9 +336,19 @@ server <- function(input, output, session) {
                                 , "Number of Suicides vs. Year") +
                         theme_bw())
     
+    # bar chart shows suicide_total vs. age
+    pt2 <- reactive(data_by_age_sex() %>%
+                        ggplot(aes(x = fct_relevel(age, "5-14 years"), y = suicide_rate)) +
+                        geom_col(aes(fill = sex), position="dodge")+
+                        xlab("Age Group") +
+                        ylab("Suicides Rate") +
+                        scale_y_continuous(labels = scales::number_format(accuracy = 0.00001)) + 
+                        ggtitle("", subtitle = "Number of Suicides vs. Age Group")+
+                        theme_bw() + 
+                        theme(axis.text.x = element_text(angle = -90, hjust = 1)))
     
     # Line chart shows gdp vs. year
-    pt2 <- reactive(data_by_year() %>%
+    pt3 <- reactive(data_by_year() %>%
                         ggplot(aes(x = year, y = Value)) +
                         geom_line(size = 2) + 
                         expand_limits(y = 0) +
@@ -284,7 +358,7 @@ server <- function(input, output, session) {
                         theme_bw())
     
     # Line chart shows pop vs. year
-    pt3 <- reactive(data_by_sex() %>% 
+    pt4 <- reactive(data_by_sex() %>% 
                         ggplot(aes(x = year, y = pop)) +
                         geom_line(aes(color = sex), size = 2) +
                         geom_line(data = data_by_year(), size = 2) + 
@@ -295,6 +369,7 @@ server <- function(input, output, session) {
                         ggtitle("", subtitle = "Population vs. Year") +
                         theme_bw())
     
+<<<<<<< HEAD
     # bar chart shows suicide_total vs. age
     pt4 <- reactive(data_by_age() %>%
                         ggplot(aes(x = fct_relevel(age, "5-14 years"), y = suicide_rate)) +
@@ -306,6 +381,8 @@ server <- function(input, output, session) {
                         theme_bw() + 
                         theme(axis.text.x = element_text(angle = 45, hjust = 1)))
     
+=======
+>>>>>>> 07cf9a024913787cd5c9565ad2c31ef4fe4a0a8a
     # scatter chart shows suicide_rate vs. Log Population over the world
     # This plot does not need to be interactive
     pt5 <- reactive(world_by_country_year() %>%
@@ -358,7 +435,11 @@ server <- function(input, output, session) {
                         ylab("Number of Suicides") +
                         ggtitle("",subtitle = "Number of Suicides vs. Age Group")+
                         theme_bw() + 
+<<<<<<< HEAD
                         theme(axis.text.x = element_text(angle = 45, hjust = 1)))
+=======
+                        theme(axis.text.x = element_text(angle = -90, hjust = 1)))
+>>>>>>> 07cf9a024913787cd5c9565ad2c31ef4fe4a0a8a
     
     # render plots with gridExtra
     output$plotgraph = renderPlot({
