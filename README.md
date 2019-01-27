@@ -21,13 +21,17 @@ When Wilson logs into his "Suicide Statistics" app he will be greeted with a wor
 
 The home page of the shiny app contains a global heat map which shows the distribution of suicide rate across the world. On the bottom of the page, there is a slider that can adjust which year of data you're viewing. The main control panel is on the left third of the page. There are a variety of sliders and radio buttons which allow users to filter out and change variables on the main display. Moreover, there is a dropdown menu which can filter countries. Once users select a country from the menu, the app will direct users to a subpage that shows the distribution (bar chart, line chart) of dataset factors (year, suicide rate etc) based on the selected country. Further, there is an :earth_americas: icon on the bottom right corner of the home page which directs users to another subpage. On this subpage, there are plots (scatter plot, line chart) that show global trends and relations between factors. Lastly, users can click on the :bar_chart: icon on the bottom right corner of the subpage to go back to the home page.
 
-### Release Version
+### Release Versions
 
-[Milestone 1 v0.1](https://github.com/UBC-MDS/DSCI_532_Suicide_Statistics/tree/v0.1)[Milestone 2 v0.2](https://github.com/UBC-MDS/DSCI_532_Suicide_Statistics/tree/v0.2)
+[Milestone 1 v0.1](https://github.com/UBC-MDS/DSCI_532_Suicide_Statistics/tree/v0.1)
+
+[Milestone 2 v0.2](https://github.com/UBC-MDS/DSCI_532_Suicide_Statistics/tree/v0.2)
+
 [Milestone 3 v0.3](https://github.com/UBC-MDS/DSCI_532_Suicide_Statistics/tree/v0.3)
 
 ### Issues Created
 [Issue 1](https://github.com/UBC-MDS/DSCI_532_Mental-health-survey-Tech/issues/12)
+
 [Issue 2](https://github.com/UBC-MDS/DSCI532_Davy_Reza/issues/6)
 
 ### Original Sketches of App
