@@ -1,4 +1,4 @@
-# Milestone 2:First submission of an app
+# Milestone 3
 #### Wilson Deng, Rayce Rossum
 
 #### Deployment (shinyapps.io)
