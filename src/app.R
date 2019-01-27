@@ -366,7 +366,8 @@ server <- function(input, output, session) {
                         expand_limits(y = 0) +
                         xlab("Year")+
                         ylab("Population") +
-                        ggtitle("", subtitle = "Population vs. Year") +
+                        ggtitle("",
+                                subtitle = "Population vs. Year") +
                         theme_bw())
     
     # scatter chart shows suicide_rate vs. Log Population over the world

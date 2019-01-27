@@ -23,12 +23,23 @@ The home page of the shiny app contains a global heat map which shows the distri
 
 ### Release Version
 
-[Milestone 1 v0.1](https://github.com/UBC-MDS/DSCI_532_Suicide_Statistics/tree/v0.1)
+[Milestone 1 v0.1](https://github.com/UBC-MDS/DSCI_532_Suicide_Statistics/tree/v0.1)[Milestone 2 v0.2](https://github.com/UBC-MDS/DSCI_532_Suicide_Statistics/tree/v0.2)
+[Milestone 3 v0.3](https://github.com/UBC-MDS/DSCI_532_Suicide_Statistics/tree/v0.3)
 
-### Sketch of App
+### Issues Created
+[Issue 1](https://github.com/UBC-MDS/DSCI_532_Mental-health-survey-Tech/issues/12)
+[Issue 2](https://github.com/UBC-MDS/DSCI532_Davy_Reza/issues/6)
+
+### Original Sketches of App
 
 ![](imgs/Sketch1.png)
 
 ![](imgs/Sketch2.png)
 
 ![](imgs/Sketch3.png)
+
+### Updated Sketches of App
+
+![](imgs/Sketch4.png)
+
+![](imgs/Sketch5.png)
