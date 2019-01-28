@@ -551,11 +551,7 @@ server <- function(input, output, session) {
     # render plots with gridExtra
     output$plotgraph = renderPlotly({
         subplot(pt1(),pt2(),pt3(),pt4(),
-                nrows=2)
-=======
-        subplot(pt1(), pt2(), pt3(), pt4(),
-                nrows = 2)
->>>>>>> bdb9f85d17cfeaa1729ec427afb811c099f244ad
+                nrows=2, margin = c(0.1,0.1,0.1,0.1))
     })
 
     output$plotgraph_world = renderPlot({
