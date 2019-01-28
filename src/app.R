@@ -473,80 +473,88 @@ server <- function(input, output, session) {
 
     # scatter chart shows suicide_rate vs. Log Population over the world
     # This plot does not need to be interactive
-    pt5 <- reactive(
-        world_by_country_year() %>%
-            left_join(gdpData, by = c(
-                "country" = "Country or Area", "year" = "Year"
-            )) %>%
-            ggplot(aes(x = pop, y = suicide_rate)) +
-            #geom_point(alpha = 0.4) +
-            geom_bin2d() +
-            scale_x_log10(
-                breaks = scales::trans_breaks("log10", function(x)
-                    10 ^ x),
-                labels = scales::trans_format("log10", scales::math_format(10 ^
-                                                                               .x))
-            ) +
-            scale_y_continuous(labels = scales::number_format(accuracy = 0.0001)) +
-            #scale_y_continuous(scales::number_format(accuracy = 0.01)) +
-            xlab("log Population") +
-            ylab("Suicide Rate") +
-            ggtitle(
-                paste("World from", input$year[1], "to", input$year[2]),
-                subtitle = "Suicide Rate vs. Log Population"
-            ) +
-            theme_bw()
-    )
+    pt5 <- reactive(hide_legend(
+        ggplotly(
+            world_by_country_year() %>%
+                left_join(gdpData, by = c(
+                    "country" = "Country or Area", "year" = "Year"
+                )) %>%
+                ggplot(aes(x = pop, y = suicide_rate)) +
+                #geom_point(alpha = 0.4) +
+                geom_bin2d() +
+                scale_x_log10(
+                    breaks = scales::trans_breaks("log10", function(x)
+                        10 ^ x),
+                    labels = scales::trans_format("log10", scales::math_format(10 ^
+                                                                                   .x))
+                ) +
+                scale_y_continuous(labels = scales::number_format(accuracy = 0.0001)) +
+                #scale_y_continuous(scales::number_format(accuracy = 0.01)) +
+                xlab("log Population") +
+                ylab("Suicide Rate") +
+                ggtitle(
+                    paste("World from", input$year[1], "to", input$year[2]),
+                    subtitle = "Suicide Rate vs. Log Population"
+                ) +
+                theme_bw()
+        )
+    ))
 
     # scatter chart shows suicide_rate vs. Log GDP over the world
     # This plot does not need to be interactive
-    pt6 <- reactive(
-        world_by_country_year() %>%
-            ggplot(aes(x = Value, y = suicide_rate)) +
-            geom_bin2d() +
-            scale_x_log10(
-                breaks = scales::trans_breaks("log10", function(x)
-                    10 ^ x),
-                labels = scales::trans_format("log10", scales::math_format(10 ^
-                                                                               .x))
-            ) +
-            scale_y_continuous(labels = scales::number_format(accuracy = 0.0001)) +
-            xlab("log GDP Per Capita") +
-            ylab("Suicide Rate") +
-            ggtitle("", subtitle = "Suicide Rate vs. Log GDP Per Capita") +
-            theme_bw()
-    )
+    pt6 <- reactive(hide_legend(
+        ggplotly(
+            world_by_country_year() %>%
+                ggplot(aes(x = Value, y = suicide_rate)) +
+                geom_bin2d() +
+                scale_x_log10(
+                    breaks = scales::trans_breaks("log10", function(x)
+                        10 ^ x),
+                    labels = scales::trans_format("log10", scales::math_format(10 ^
+                                                                                   .x))
+                ) +
+                scale_y_continuous(labels = scales::number_format(accuracy = 0.0001)) +
+                xlab("log GDP Per Capita") +
+                ylab("Suicide Rate") +
+                ggtitle("", subtitle = "Suicide Rate vs. Log GDP Per Capita") +
+                theme_bw()
+        )
+    ))
 
 
     # Line chart shows suicide_rate vs. Year over the world
     # This plot is only interactive with year and/or sex input
-    pt7 <- reactive(
-        world_by_sex_year() %>%
-            ggplot(aes(x = year, y = suicide_rate)) +
-            geom_line(aes(color = sex), size = 2) +
-            geom_line(data = world_by_year(), size = 2) +
-            xlab("Year") +
-            ylab("Suicide Rate") +
-            ggtitle("", subtitle = "Suicide Rate vs. Year") +
-            theme_bw()
-    )
+    pt7 <- reactive(hide_legend(
+        ggplotly(
+            world_by_sex_year() %>%
+                ggplot(aes(x = year, y = suicide_rate)) +
+                geom_line(aes(color = sex), size = 2) +
+                geom_line(data = world_by_year(), size = 2) +
+                xlab("Year") +
+                ylab("Suicide Rate") +
+                ggtitle("", subtitle = "Suicide Rate vs. Year") +
+                theme_bw()
+        )
+    ))
 
     # bar chart shows suicide_rage vs. age world
     # This plot is only interactive with year and/or sex input
-    pt8 <- reactive(
-        world_by_sex_year_age() %>%
-            ggplot(aes(
-                x = fct_relevel(age, "5-14 years"), y = suicides_total
-            )) +
-            geom_col(aes(fill = sex), position = "dodge") +
-            xlab("Age Group") +
-            ylab("Number of Suicides") +
-            ggtitle("", subtitle = "Number of Suicides vs. Age Group") +
-            theme_bw() +
-            theme(axis.text.x = element_text(
-                angle = -90, hjust = 1
-            ))
-    )
+    pt8 <- reactive(hide_legend(
+        ggplotly(
+            world_by_sex_year_age() %>%
+                ggplot(aes(
+                    x = fct_relevel(age, "5-14 years"), y = suicides_total
+                )) +
+                geom_col(aes(fill = sex), position = "dodge") +
+                xlab("Age Group") +
+                ylab("Number of Suicides") +
+                ggtitle("", subtitle = "Number of Suicides vs. Age Group") +
+                theme_bw() +
+                theme(axis.text.x = element_text(
+                    angle = -90, hjust = 1
+                ))
+        )
+    ))
 
     # render plots with gridExtra
     output$plotgraph = renderPlotly({
@@ -554,10 +562,9 @@ server <- function(input, output, session) {
                 nrows=2, margin = c(0.1,0.1,0.1,0.1))
     })
 
-    output$plotgraph_world = renderPlot({
-        ptlist <-
-            grid.arrange(grobs = list(pt5(), pt6(), pt7(), pt8()),
-                         ncol = 2)
+    output$plotgraph_world = renderPlotly({
+        subplot(pt5(), pt6(), pt7(), pt8(),
+                nrows = 2)
     })
 }
 
