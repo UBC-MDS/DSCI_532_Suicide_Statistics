@@ -16,6 +16,7 @@ library(leaflet.extras)
 library(jsonlite)
 library(ggmap)
 library(gridExtra)
+library(plotly)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(theme = shinytheme("simplex"),
@@ -326,7 +327,7 @@ server <- function(input, output, session) {
     # })
     
     # Line chart shows Suicide Total vs. year
-    pt1 <- reactive(data_by_sex() %>% 
+    pt1 <- reactive(ggplotly(data_by_sex() %>% 
                         ggplot(aes(x = year, y = suicide_rate)) +
                         geom_line(aes(color = sex), size = 2)+
                         xlab("Year")+
@@ -334,10 +335,10 @@ server <- function(input, output, session) {
                         scale_y_continuous(labels = scales::number_format(accuracy = 0.00001)) + 
                         ggtitle(paste(input$location, "From", input$year[1], "to", input$year[2])
                                 , "Number of Suicides vs. Year") +
-                        theme_bw())
+                        theme_bw()))
     
     # bar chart shows suicide_total vs. age
-    pt2 <- reactive(data_by_age_sex() %>%
+    pt2 <- reactive(ggplotly(data_by_age_sex() %>%
                         ggplot(aes(x = fct_relevel(age, "5-14 years"), y = suicide_rate)) +
                         geom_col(aes(fill = sex), position="dodge")+
                         xlab("Age Group") +
@@ -345,20 +346,20 @@ server <- function(input, output, session) {
                         scale_y_continuous(labels = scales::number_format(accuracy = 0.00001)) + 
                         ggtitle("", subtitle = "Number of Suicides vs. Age Group")+
                         theme_bw() + 
-                        theme(axis.text.x = element_text(angle = -90, hjust = 1)))
+                        theme(axis.text.x = element_text(angle = -90, hjust = 1))))
     
     # Line chart shows gdp vs. year
-    pt3 <- reactive(data_by_year() %>%
+    pt3 <- reactive(ggplotly(data_by_year() %>%
                         ggplot(aes(x = year, y = Value)) +
                         geom_line(size = 2) + 
                         expand_limits(y = 0) +
                         xlab("Year")+
                         ylab("GDP Per Capita") +
                         ggtitle("", subtitle = "GDP Per Capita vs. Year") +
-                        theme_bw())
+                        theme_bw()))
     
     # Line chart shows pop vs. year
-    pt4 <- reactive(data_by_sex() %>% 
+    pt4 <- reactive(ggplotly(data_by_sex() %>% 
                         ggplot(aes(x = year, y = pop)) +
                         geom_line(aes(color = sex), size = 2) +
                         geom_line(data = data_by_year(), size = 2) + 
@@ -368,7 +369,7 @@ server <- function(input, output, session) {
                         ylab("Population") +
                         ggtitle("",
                                 subtitle = "Population vs. Year") +
-                        theme_bw())
+                        theme_bw()))
     
     # scatter chart shows suicide_rate vs. Log Population over the world
     # This plot does not need to be interactive
@@ -425,10 +426,10 @@ server <- function(input, output, session) {
                         theme(axis.text.x = element_text(angle = -90, hjust = 1)))
     
     # render plots with gridExtra
-    output$plotgraph = renderPlot({
-        ptlist <- 
-            grid.arrange(grobs=list(pt1(),pt2(),pt3(),pt4()),
-                         ncol=2)
+    output$plotgraph = renderPlotly({
+       pt1()
+        # subplot(pt1(),pt2(),pt3(),pt4(),
+        #                  nrows=2)
     })
     
     output$plotgraph_world = renderPlot({
