@@ -19,34 +19,34 @@ library(gridExtra)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(theme = shinytheme("simplex"),
-    
-    # Application title
-    titlePanel("World Suicide Statistics by Country"),
-    
-    # Sidebar with a slider input for number of bins 
-    sidebarLayout(
-        sidebarPanel(
-            uiOutput('location'),
-            #uiOutput('suicide_total'),
-            uiOutput('year'),
-            #uiOutput('gdp'),
-            #uiOutput('population'),
-            uiOutput('age'),
-            uiOutput("sex")
-        ),
-        
-        
-        # Show a plot of the generated distribution
-        mainPanel(
-            tabsetPanel(
-                        tabPanel("Country", column(6,plotOutput(outputId="plotgraph", width="800px",height="640px"))),
-                        tabPanel("World", column(6,plotOutput(outputId="plotgraph_world", width="800px",height="640px")))#,
-                        
-                        #leafletOutput("suicideMap")
-                        
-            )
-        )
-    )
+                
+                # Application title
+                titlePanel("World Suicide Statistics by Country"),
+                
+                # Sidebar with a slider input for number of bins 
+                sidebarLayout(
+                    sidebarPanel(
+                        uiOutput('location'),
+                        #uiOutput('suicide_total'),
+                        uiOutput('year'),
+                        #uiOutput('gdp'),
+                        #uiOutput('population'),
+                        uiOutput('age'),
+                        uiOutput("sex")
+                    ),
+                    
+                    
+                    # Show a plot of the generated distribution
+                    mainPanel(
+                        tabsetPanel(
+                            tabPanel("Country", column(6,plotOutput(outputId="plotgraph", width="800px",height="640px"))),
+                            tabPanel("World", column(6,plotOutput(outputId="plotgraph_world", width="800px",height="640px")))#,
+                            
+                            #leafletOutput("suicideMap")
+                            
+                        )
+                    )
+                )
 )
 
 # Define server logic required to draw a histogram
@@ -72,7 +72,7 @@ server <- function(input, output, session) {
     colMin <- function(data) sapply(data, min, na.rm = TRUE)
     
     # Data wrangling
-    # Need to add sex/age filter
+    # Need to add sex filter
     data_by_year <- reactive({suicideData %>%
             group_by(country, year) %>%
             summarise(suicides_total = sum(suicides_no, na.rm = TRUE), pop = sum(population, na.rm = TRUE)) %>%
@@ -194,7 +194,7 @@ server <- function(input, output, session) {
                    sex %in% sexSelection,
                    age %in% ageSelection)
     })
-
+    
     
     output$location = renderUI({
         selectInput("location",
@@ -370,20 +370,6 @@ server <- function(input, output, session) {
                                 subtitle = "Population vs. Year") +
                         theme_bw())
     
-<<<<<<< HEAD
-    # bar chart shows suicide_total vs. age
-    pt4 <- reactive(data_by_age() %>%
-                        ggplot(aes(x = fct_relevel(age, "5-14 years"), y = suicide_rate)) +
-                        geom_col(aes(fill = sex), position="dodge")+
-                        xlab("Age Group") +
-                        ylab("Suicides Rate") +
-                        scale_y_continuous(labels = scales::number_format(accuracy = 0.00001)) + 
-                        ggtitle("", subtitle = "Number of Suicides vs. Age Group")+
-                        theme_bw() + 
-                        theme(axis.text.x = element_text(angle = 45, hjust = 1)))
-    
-=======
->>>>>>> 07cf9a024913787cd5c9565ad2c31ef4fe4a0a8a
     # scatter chart shows suicide_rate vs. Log Population over the world
     # This plot does not need to be interactive
     pt5 <- reactive(world_by_country_year() %>%
@@ -436,11 +422,7 @@ server <- function(input, output, session) {
                         ylab("Number of Suicides") +
                         ggtitle("",subtitle = "Number of Suicides vs. Age Group")+
                         theme_bw() + 
-<<<<<<< HEAD
-                        theme(axis.text.x = element_text(angle = 45, hjust = 1)))
-=======
                         theme(axis.text.x = element_text(angle = -90, hjust = 1)))
->>>>>>> 07cf9a024913787cd5c9565ad2c31ef4fe4a0a8a
     
     # render plots with gridExtra
     output$plotgraph = renderPlot({
