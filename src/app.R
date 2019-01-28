@@ -427,7 +427,7 @@ server <- function(input, output, session) {
     
     # render plots with gridExtra
     output$plotgraph = renderPlotly({
-       pt1()
+       print(pt1())
         # subplot(pt1(),pt2(),pt3(),pt4(),
         #                  nrows=2)
     })
