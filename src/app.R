@@ -40,8 +40,8 @@ ui <- fluidPage(theme = shinytheme("simplex"),
                     # Show a plot of the generated distribution
                     mainPanel(
                         tabsetPanel(
-                            tabPanel("Country", column(6,plotOutput(outputId="plotgraph", width="800px",height="640px"))),
-                            tabPanel("World", column(6,plotOutput(outputId="plotgraph_world", width="800px",height="640px")))#,
+                            tabPanel("Country", column(6,plotlyOutput(outputId="plotgraph", width="800px",height="640px"))),
+                            tabPanel("World", column(6,plotlyOutput(outputId="plotgraph_world", width="800px",height="640px")))#,
                             
                             #leafletOutput("suicideMap")
                             
@@ -84,10 +84,14 @@ server <- function(input, output, session) {
     })
     
     data_by_sex <- reactive({
+        char0 <- character(0)
         sexSelection = tolower(input$sex)
-        if (input$sex == "All"){
+
+        if (sexSelection == "all" || identical(char0, character(0)) ){
             sexSelection <- c("male", "female")
         }
+        
+        print(sexSelection)
         
         suicideData %>%
             group_by(country, year,sex) %>%
@@ -327,7 +331,8 @@ server <- function(input, output, session) {
     # })
     
     # Line chart shows Suicide Total vs. year
-    pt1 <- reactive(ggplotly(data_by_sex() %>% 
+    pt1 <- reactive({
+                    plot <- data_by_sex() %>% 
                         ggplot(aes(x = year, y = suicide_rate)) +
                         geom_line(aes(color = sex), size = 2)+
                         xlab("Year")+
@@ -335,7 +340,11 @@ server <- function(input, output, session) {
                         scale_y_continuous(labels = scales::number_format(accuracy = 0.00001)) + 
                         ggtitle(paste(input$location, "From", input$year[1], "to", input$year[2])
                                 , "Number of Suicides vs. Year") +
-                        theme_bw()))
+                        theme_bw()
+                    
+            return(ggplotly(plot))
+        })
+    
     
     # bar chart shows suicide_total vs. age
     pt2 <- reactive(ggplotly(data_by_age_sex() %>%
@@ -427,9 +436,14 @@ server <- function(input, output, session) {
     
     # render plots with gridExtra
     output$plotgraph = renderPlotly({
+<<<<<<< HEAD
        print(pt1())
         # subplot(pt1(),pt2(),pt3(),pt4(),
         #                  nrows=2)
+=======
+        subplot(pt1(),pt2(),pt3(),pt4(),
+                nrows=2)
+>>>>>>> 39a31352457ce944d0d9f6e6325b18ef20ae7de5
     })
     
     output$plotgraph_world = renderPlot({
