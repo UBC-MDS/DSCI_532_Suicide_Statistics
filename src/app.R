@@ -15,10 +15,10 @@ library(tidyverse)
 library(shiny)
 library(shinyWidgets)
 library(shinythemes)
-library(leaflet)
-library(leaflet.extras)
-library(jsonlite)
-library(ggmap)
+# library(leaflet)
+# library(leaflet.extras)
+# library(jsonlite)
+# library(ggmap)
 library(gridExtra)
 library(plotly)
 
@@ -208,8 +208,6 @@ server <- function(input, output, session) {
             sexSelection <- c("male", "female")
         }
 
-        # print(sexSelection)
-
         suicideData %>%
             group_by(year, sex) %>%
             summarise(
@@ -230,8 +228,6 @@ server <- function(input, output, session) {
         for (i in ageRange[1]:ageRange[2]) {
             ageSelection[i] = paste(ageGroups[i], "years")
         }
-
-        print(ageSelection)
 
         sexSelection = tolower(input$sex)
         if (input$sex == "All") {
