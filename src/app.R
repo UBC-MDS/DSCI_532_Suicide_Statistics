@@ -1,10 +1,14 @@
+# app.R
+# Wilson Deng, Rayce Rossum
+# Date: 2019. 01, 28
+# An exploration of data from WHO and the UN on suicide statistics.
 #
 # This is a Shiny web application. You can run the application by clicking
 # the 'Run App' button above.
 #
 # Find out more about building applications with Shiny here:
 #
-#    http://shiny.rstudio.com/
+# http://shiny.rstudio.com/
 #
 
 library(tidyverse)
@@ -18,12 +22,11 @@ library(ggmap)
 library(gridExtra)
 library(plotly)
 
-# Define UI for application that draws a histogram
+# Define UI for application
 ui <- fluidPage(
     theme = shinytheme("simplex"),
     # Application title
     titlePanel("World Suicide Statistics by Country"),
-
     # Sidebar with a slider input for number of bins
     sidebarLayout(
         sidebarPanel(
@@ -37,10 +40,11 @@ ui <- fluidPage(
         ),
 
 
-        # Show a plot of the generated distribution
+        # mainPanel contains two tabsets: country and world
         mainPanel(tabsetPanel(
             tabPanel("Country", column(
                 6,
+                h4(textOutput("title1")),
                 plotlyOutput(
                     outputId = "plotgraph",
                     width = "800px",
@@ -49,6 +53,7 @@ ui <- fluidPage(
             )),
             tabPanel("World", column(
                 6,
+                h4(textOutput("title2")),
                 plotlyOutput(
                     outputId = "plotgraph_world",
                     width = "800px",
@@ -62,12 +67,10 @@ ui <- fluidPage(
     )
 )
 
-# Define server logic required to draw a histogram
+# Define server logic
 server <- function(input, output, session) {
     suicideData = read_csv("data/who_suicide_statistics.csv")
     gdpData <- read_csv("data/UN_Gdp_data.csv")
-
-    #View(suicideData)
 
     tidy_data <- suicideData %>%
         group_by(country, year) %>%
@@ -91,7 +94,6 @@ server <- function(input, output, session) {
         sapply(data, min, na.rm = TRUE)
 
     # Data wrangling
-    # Need to add sex filter
     data_by_year <- reactive({
         suicideData %>%
             group_by(country, year) %>%
@@ -114,9 +116,7 @@ server <- function(input, output, session) {
             identical(char0, character(0))) {
             sexSelection <- c("male", "female")
         }
-
-        print(sexSelection)
-
+        
         suicideData %>%
             group_by(country, year, sex) %>%
             summarise(
@@ -208,7 +208,7 @@ server <- function(input, output, session) {
             sexSelection <- c("male", "female")
         }
 
-        print(sexSelection)
+        # print(sexSelection)
 
         suicideData %>%
             group_by(year, sex) %>%
@@ -253,7 +253,6 @@ server <- function(input, output, session) {
                 age %in% ageSelection
             )
     })
-
 
     output$location = renderUI({
         selectInput("location",
@@ -325,6 +324,8 @@ server <- function(input, output, session) {
             inline = TRUE
         )
     })
+    
+    # Create a map by leaflet. Abondoned after milestone2
 
     # getSelectedLocation <- reactive({
     #     location_to_search <- input$location
@@ -406,11 +407,8 @@ server <- function(input, output, session) {
                     xlab("Year") +
                     ylab("Suicide Rate") +
                     scale_y_continuous(labels = scales::number_format(accuracy = 0.00001)) +
-                    ggtitle(
-                        paste(input$location, "From", input$year[1], "to", input$year[2])
-                        ,
-                        "Number of Suicides vs. Year"
-                    ) +
+                    # ggtitle(paste(input$location, "From", input$year[1], "to", input$year[2])
+                    # ) +
                     theme_bw()
             )
         )
@@ -429,7 +427,7 @@ server <- function(input, output, session) {
                     xlab("Age Group") +
                     ylab("Suicides Rate") +
                     scale_y_continuous(labels = scales::number_format(accuracy = 0.00001)) +
-                    ggtitle("", subtitle = "Number of Suicides vs. Age Group") +
+                    # ggtitle("Number of Suicides vs. Age Group") +
                     theme_bw() +
                     theme(axis.text.x = element_text(
                         angle = -90, hjust = 1
@@ -448,7 +446,7 @@ server <- function(input, output, session) {
                     expand_limits(y = 0) +
                     xlab("Year") +
                     ylab("GDP Per Capita") +
-                    ggtitle("", subtitle = "GDP Per Capita vs. Year") +
+                    # ggtitle("GDP Per Capita vs. Year") +
                     theme_bw()
             )
         )
@@ -465,8 +463,7 @@ server <- function(input, output, session) {
                 expand_limits(y = 0) +
                 xlab("Year") +
                 ylab("Population") +
-                ggtitle("",
-                        subtitle = "Population vs. Year") +
+                # ggtitle("Population vs. Year") +
                 theme_bw()
         )
     ))
@@ -484,18 +481,18 @@ server <- function(input, output, session) {
                 geom_bin2d() +
                 scale_x_log10(
                     breaks = scales::trans_breaks("log10", function(x)
-                        10 ^ x),
-                    labels = scales::trans_format("log10", scales::math_format(10 ^
-                                                                                   .x))
+                        10 ^ x)
+                    # labels = scales::trans_format("log10", scales::math_format(10 ^
+                    #                                                                .x))
                 ) +
                 scale_y_continuous(labels = scales::number_format(accuracy = 0.0001)) +
                 #scale_y_continuous(scales::number_format(accuracy = 0.01)) +
                 xlab("log Population") +
                 ylab("Suicide Rate") +
-                ggtitle(
-                    paste("World from", input$year[1], "to", input$year[2]),
-                    subtitle = "Suicide Rate vs. Log Population"
-                ) +
+                # ggtitle(
+                #     paste("World from", input$year[1], "to", input$year[2]),
+                #     subtitle = "Suicide Rate vs. Log Population"
+                # ) +
                 theme_bw()
         )
     ))
@@ -508,15 +505,15 @@ server <- function(input, output, session) {
                 ggplot(aes(x = Value, y = suicide_rate)) +
                 geom_bin2d() +
                 scale_x_log10(
-                    breaks = scales::trans_breaks("log10", function(x)
-                        10 ^ x),
-                    labels = scales::trans_format("log10", scales::math_format(10 ^
-                                                                                   .x))
+                    # breaks = scales::trans_breaks("log10", function(x)
+                    #     10 ^ x)#,
+                    # labels = scales::trans_format("log10", scales::math_format(10 ^
+                    #                                                                .x))
                 ) +
                 scale_y_continuous(labels = scales::number_format(accuracy = 0.0001)) +
                 xlab("log GDP Per Capita") +
                 ylab("Suicide Rate") +
-                ggtitle("", subtitle = "Suicide Rate vs. Log GDP Per Capita") +
+                # ggtitle("", subtitle = "Suicide Rate vs. Log GDP Per Capita") +
                 theme_bw()
         )
     ))
@@ -532,13 +529,12 @@ server <- function(input, output, session) {
                 geom_line(data = world_by_year(), size = 2) +
                 xlab("Year") +
                 ylab("Suicide Rate") +
-                ggtitle("", subtitle = "Suicide Rate vs. Year") +
+                # ggtitle("", subtitle = "Suicide Rate vs. Year") +
                 theme_bw()
         )
     ))
 
     # bar chart shows suicide_rage vs. age world
-    # This plot is only interactive with year and/or sex input
     pt8 <- reactive(hide_legend(
         ggplotly(
             world_by_sex_year_age() %>%
@@ -548,7 +544,7 @@ server <- function(input, output, session) {
                 geom_col(aes(fill = sex), position = "dodge") +
                 xlab("Age Group") +
                 ylab("Number of Suicides") +
-                ggtitle("", subtitle = "Number of Suicides vs. Age Group") +
+                # ggtitle("", subtitle = "Number of Suicides vs. Age Group") +
                 theme_bw() +
                 theme(axis.text.x = element_text(
                     angle = -90, hjust = 1
@@ -556,16 +552,35 @@ server <- function(input, output, session) {
         )
     ))
 
-    # render plots with gridExtra
+    # render plots with subplot+layout
     output$plotgraph = renderPlotly({
         subplot(pt1(),pt2(),pt3(),pt4(),
-                nrows=2, margin = c(0.1,0.1,0.1,0.1))
+                nrows=2, margin = 0.1) %>% 
+        layout(annotations = list(list(x = 0.06 , y = 1.05, text = "Number of Suicides vs. Year", showarrow = F, xref='paper', yref='paper'),
+                                  list(x = 0.96 , y = 1.05, text = "Number of Suicides vs. Age Group", showarrow = F, xref='paper', yref='paper'),
+                                  list(x = 0.1 , y = 0.44, text = "GDP Per Capita vs. Year", showarrow = F, xref='paper', yref='paper'),
+                                  list(x = 0.9 , y = 0.44, text = "Population vs. Year", showarrow = F, xref='paper', yref='paper'))
+               )
     })
 
     output$plotgraph_world = renderPlotly({
         subplot(pt5(), pt6(), pt7(), pt8(),
-                nrows = 2)
+                nrows = 2, margin = 0.1) %>% 
+        layout(annotations = list(list(x = 0.04 , y = 1.05, text = "Suicide Rate vs. Log Population", showarrow = F, xref='paper', yref='paper'),
+                                  list(x = 0.98 , y = 1.05, text = "Suicide Rate vs. Log GDP Per Capita", showarrow = F, xref='paper', yref='paper'),
+                                  list(x = 0.1 , y = 0.44, text = "Suicide Rate vs. Year", showarrow = F, xref='paper', yref='paper'),
+                                  list(x = 0.98 , y = 0.44, text = "Number of Suicides vs. Age Group", showarrow = F, xref='paper', yref='paper'))
+            )
     })
+    
+    # render titles
+    output$title1 <- renderText(
+        paste(input$location, "from", input$year[1], "to", input$year[2]), quoted = FALSE
+    )
+    
+    output$title2 <- renderText(
+        paste("World from", input$year[1], "to", input$year[2]), quoted = FALSE
+    )
 }
 
 # Run the application
