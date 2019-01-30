@@ -6,8 +6,7 @@ This app is published on shinyapps.io. Our deployed Shiny App can be found [here
 
 ## Overview
 
-As the media reports increases in suicide rates, mental health initiatives are becoming more prevelant around the world. Being able to understand factors that influence suicide rates in different countries would allow these initiatives to improve their outreach and save more lives. In order to address this problem, we propose a data visualization app that allows mental health initiatives to visually explore various visualizations over a variety of factors. Our app will use a combination of world and country maps and distribution charts to provide this information.
-
+As the media reports increases in suicide rates, mental health initiatives are becoming more prevelant around the world. Being able to understand factors that influence suicide rates in different countries would allow these initiatives to improve their outreach and save more lives. In order to address this problem, we propose a data visualization app that allows mental health initiatives to visually explore various visualizations over a variety of factors.
 
 ## Dependencies
 
