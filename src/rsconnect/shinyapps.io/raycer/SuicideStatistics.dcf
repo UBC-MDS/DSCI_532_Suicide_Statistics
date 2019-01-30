@@ -5,6 +5,6 @@ account: raycer
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 655886
-bundleId: 1839034
+bundleId: 1846779
 url: https://raycer.shinyapps.io/SuicideStatistics/
-when: 1548550790.41877
+when: 1548883669.10813
