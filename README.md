@@ -30,6 +30,8 @@ As the media reports increases in suicide rates, mental health initiatives are b
 
 [Milestone 3 v0.3](https://github.com/UBC-MDS/DSCI_532_Suicide_Statistics/tree/v0.3)
 
+[Milestone 4 v0.4](https://github.com/UBC-MDS/DSCI_532_Suicide_Statistics/tree/v0.4)
+
 ## Feedbacks
 [Issue 1](https://github.com/UBC-MDS/DSCI_532_Mental-health-survey-Tech/issues/12)
 
